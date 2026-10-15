@@ -1,0 +1,41 @@
+name: prepaid-telco-db
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-telco}
+      POSTGRES_USER: ${POSTGRES_USER:-telco}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-telco}
+      # so `docker compose exec db psql` and the scripts connect without flags
+      PGDATABASE: ${POSTGRES_DB:-telco}
+      PGUSER: ${POSTGRES_USER:-telco}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-telco}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./:/workspace:ro          # seeds, tests and queries are run from here
+    working_dir: /workspace
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  flyway:
+    image: flyway/flyway:10
+    command: migrate
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-telco}
+      FLYWAY_USER: ${POSTGRES_USER:-telco}
+      FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-telco}
+      FLYWAY_CONNECT_RETRIES: 20
+    volumes:
+      - ./db/migrations:/flyway/sql:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

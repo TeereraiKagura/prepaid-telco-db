@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  database:
+    name: Migrate, seed, test and run queries
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: telco
+          POSTGRES_USER: telco
+          POSTGRES_PASSWORD: telco
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U telco -d telco"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGDATABASE: telco
+      PGUSER: telco
+      PGPASSWORD: telco
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply migrations with Flyway
+        run: |
+          docker run --rm --network host \
+            -v "$GITHUB_WORKSPACE/db/migrations:/flyway/sql:ro" \
+            flyway/flyway:10 \
+            -url=jdbc:postgresql://localhost:5432/telco -user=telco -password=telco \
+            migrate validate
+
+      - name: Seed synthetic dataset
+        run: sh scripts/seed.sh
+
+      - name: Run SQL tests
+        run: sh scripts/test.sh
+
+      - name: Run business-question queries
+        run: sh scripts/run_queries.sh | tee query-results.txt
+
+      - name: Upload query results
+        uses: actions/upload-artifact@v4
+        with:
+          name: query-results
+          path: query-results.txt
