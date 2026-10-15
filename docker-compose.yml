@@ -31,6 +31,8 @@ services:
       FLYWAY_USER: ${POSTGRES_USER:-telco}
       FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-telco}
       FLYWAY_CONNECT_RETRIES: 20
+      # keep flyway_schema_history in public (the migrations create telco/analytics themselves)
+      FLYWAY_DEFAULT_SCHEMA: public
     volumes:
       - ./db/migrations:/flyway/sql:ro
     depends_on:

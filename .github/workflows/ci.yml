@@ -41,6 +41,7 @@ jobs:
             -v "$GITHUB_WORKSPACE/db/migrations:/flyway/sql:ro" \
             flyway/flyway:10 \
             -url=jdbc:postgresql://localhost:5432/telco -user=telco -password=telco \
+            -defaultSchema=public \
             migrate validate
 
       - name: Seed synthetic dataset
