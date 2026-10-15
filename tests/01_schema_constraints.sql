@@ -112,7 +112,7 @@ END $$;
 DO $$
 DECLARE
     v_subscriber_id bigint := (SELECT subscriber_id FROM telco.subscribers WHERE msisdn = '+263899100001');
-    v_partition     text;
+    v_partition     oid;
 BEGIN
     PERFORM pg_temp.assert_raises(
         format($q$ INSERT INTO telco.usage_events (subscriber_id, usage_type, quantity, region_id, charge_source, occurred_at)
@@ -123,8 +123,9 @@ BEGIN
     INSERT INTO telco.usage_events (subscriber_id, usage_type, quantity, region_id, charge_source,
                                     charged_amount, occurred_at)
     VALUES (v_subscriber_id, 'voice', 60, 1, 'wallet', 0.09, '2026-02-15 12:00+00')
-    RETURNING tableoid::regclass::text INTO v_partition;
-    ASSERT v_partition = 'telco.usage_events_2026_02', 'expected row in Feb 2026 partition, got ' || v_partition;
+    RETURNING tableoid INTO v_partition;
+    ASSERT v_partition = 'telco.usage_events_2026_02'::regclass,
+        'expected row in Feb 2026 partition, got ' || v_partition::regclass;
     PERFORM pg_temp.pass('usage events are routed to their monthly partition');
 END $$;
 
