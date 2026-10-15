@@ -1,6 +1,6 @@
 # Prepaid Mobile Network Database
 
-[![CI](https://github.com/YOUR_GITHUB_USERNAME/prepaid-telco-db/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/prepaid-telco-db/actions/workflows/ci.yml)
+[![CI](https://github.com/TeereraiKagura/prepaid-telco-db/actions/workflows/ci.yml/badge.svg)](https://github.com/TeereraiKagura/prepaid-telco-db/actions/workflows/ci.yml)
 ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql&logoColor=white)
 ![Flyway](https://img.shields.io/badge/migrations-Flyway-CC0200?logo=flyway&logoColor=white)
 ![Docker](https://img.shields.io/badge/run%20with-Docker-2496ED?logo=docker&logoColor=white)
@@ -211,7 +211,7 @@ voice bundle. A one-size-fits-all national promotion would miss most provinces.
 Requires **Docker** (Docker Desktop on Windows/macOS).
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/prepaid-telco-db.git
+git clone https://github.com/TeereraiKagura/prepaid-telco-db.git
 cd prepaid-telco-db
 make all        # start Postgres 16 -> Flyway migrations -> seed -> tests
 make queries    # run all 15 business questions
